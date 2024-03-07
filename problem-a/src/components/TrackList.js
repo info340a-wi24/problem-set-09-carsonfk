@@ -18,21 +18,36 @@ export default function TrackList({setAlertMessage}) { //setAlertMessage callbac
     const fetchData = async () => {
       setIsQuerying(true);
       setAlertMessage(null);
-      const data = await fetch(TRACK_QUERY_TEMPLATE.replace('{collectionId}', urlParams.collectionId)).then(data => {
-        return data.json();
-      }).catch(error => {
-        setAlertMessage(error.message);
-      }).then(data => {
-        //console.log(data.results.slice(1).length);
-        if (data.results.slice(1).length == 0) {
-          setAlertMessage('No tracks found for album');
+      await fetch(TRACK_QUERY_TEMPLATE.replace('{collectionId}', urlParams.collectionId))
+      .then(data => data.json())
+      .then(json => {
+        if (json.results.slice(1).length == 0) {
+          setAlertMessage('No tracks found for album.');
         }
-        setIsQuerying(false);
-        return data.results.slice(1)
+        setTrackData(json.results.slice(1));
       })
-      setTrackData(data);
+      .catch(error => setAlertMessage(error.message))
+      .then(() => {
+        setIsQuerying(false);
+      });
     }
     fetchData();
+
+
+    /*
+    await fetch(ALBUM_QUERY_TEMPLATE.replace('{searchTerm}', term))
+      .then(temp => temp.json())
+      .then(json => {
+        if (json.results.length == 0) {
+          setAlertMessage('No results found.');
+        }
+        setAlbumData(json.results);
+      })
+      .catch(error => setAlertMessage(error.message))
+      .then(() => {
+        setIsSearching(false);
+      });
+    */
   }, [urlParams.collectionID, setAlertMessage]);
 
   //for fun: allow for clicking to play preview audio!

@@ -17,19 +17,19 @@ function App(props) {
   async function fetchAlbumList(term) {
     setIsSearching(true);
     setAlertMessage(null);
-    const response = await fetch(ALBUM_QUERY_TEMPLATE.replace('{searchTerm}', term)).then(response => {
-      return response.json();
-    }).catch(error => {
-      setAlertMessage(error.message);
-    }).then(response => {
-      //console.log(response.results.length);
-      if (response.results.length == 0) {
+    
+    await fetch(ALBUM_QUERY_TEMPLATE.replace('{searchTerm}', term))
+    .then(resp => resp.json())
+    .then(json => {
+      if (json.results.length == 0) {
         setAlertMessage('No results found.');
       }
-      setIsSearching(false);
-      return response.results;
+      setAlbumData(json.results);
     })
-    setAlbumData(response);
+    .catch(error => setAlertMessage(error.message))
+    .then(() => {
+      setIsSearching(false);
+    });
   }
 
   return (
